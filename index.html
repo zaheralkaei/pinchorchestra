@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Pinchorchestra</title>
+  <style>
+    :root{
+      --bg:#0b0c0e;
+      --panel:#131519;
+      --panel2:#101216;
+      --border:#252a31;
+      --text:#e9edf2;
+      --muted:#b9c0c8;
+      --accent:#00e5ff;
+      --warn:#ffcc00;
+      --pink:#ff78dc;
+      --r:16px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 800px at 20% 0%, #0f1620 0%, var(--bg) 55%, #07080a 100%);
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    .wrap{
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom: 14px;
+    }
+
+    h1{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .pills{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 6px 10px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background: rgba(16,18,22,0.6);
+      font-size: 12px;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .pill b{ font-weight:700; }
+
+    .layout{
+      display:grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 14px;
+      align-items:start;
+    }
+
+    .panel{
+      border:1px solid var(--border);
+      border-radius: var(--r);
+      background: linear-gradient(180deg, rgba(19,21,25,0.9), rgba(16,18,22,0.9));
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+
+    .panel .inner{
+      padding: 12px;
+    }
+
+    .stage{
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--r);
+      overflow: hidden;
+      background: #0d0f12;
+    }
+
+    video, canvas{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+    }
+
+    video{ object-fit: cover; transform-origin:center; }
+
+    .controlsGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .row2{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .row4{ display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    select, input, button{
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(10,12,14,0.75);
+      color: var(--text);
+      padding: 9px 10px;
+      outline: none;
+    }
+
+    input[type="range"]{ padding: 8px 10px; }
+
+    button{
+      cursor:pointer;
+      background: linear-gradient(180deg, rgba(27,30,35,0.95), rgba(18,20,24,0.95));
+      transition: transform 0.04s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover{ border-color: #2f3741; }
+    button:active{ transform: translateY(1px); }
+    button.primary{
+      border-color: rgba(0,229,255,0.55);
+      background: linear-gradient(180deg, rgba(0,229,255,0.18), rgba(0,229,255,0.07));
+    }
+    button.danger{
+      border-color: rgba(255,90,90,0.5);
+      background: linear-gradient(180deg, rgba(255,90,90,0.12), rgba(255,90,90,0.05));
+    }
+
+    .status{
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: pre-wrap;
+      line-height: 1.35;
+    }
+
+    .hint{
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--border);
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    details{
+      border-top: 1px dashed var(--border);
+      margin-top: 12px;
+      padding-top: 10px;
+    }
+    summary{
+      cursor:pointer;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    /* Microtuning buttons (piano-ish layout) */
+    .micro{
+      margin-top: 10px;
+    }
+    .microKeyboard{
+      position: relative;
+      height: 98px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    .microRowWhite{
+      position:absolute; bottom:0; left:0; right:0;
+      display:flex; justify-content:space-between; gap:8px;
+    }
+    .microRowBlack{
+      position:absolute; top:0; left:0; right:0; height: 44px;
+    }
+    .microBtn{
+      width:auto;
+      padding: 10px 10px;
+      border-radius: 14px;
+      font-size: 12px;
+      border:1px solid var(--border);
+      background: rgba(27,30,35,0.85);
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .microBtn.active{
+      border-color: var(--accent);
+      background: rgba(0,229,255,0.12);
+    }
+    .microBtn.black{
+      background: rgba(8,9,11,0.90);
+      border-color: var(--border);
+    }
+    .microBtn.black.active{
+      border-color: var(--warn);
+      background: rgba(255,204,0,0.10);
+    }
+    .blackPos{ position:absolute; top:0; transform: translateX(-50%); }
+
+    .posCs{ left: 14.5%; }
+    .posDs{ left: 30.5%; }
+    .posFs{ left: 60.5%; }
+    .posGs{ left: 76.5%; }
+    .posAs{ left: 92.0%; }
+
+    .divider{
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      margin: 12px 0;
+    }
+
+    /* Advanced under-screen panel */
+    .below{
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1020px){
+      .layout{ grid-template-columns: 1fr; }
+      .pills{ justify-content:flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1>Pinchorchestra</h1>
+        <div class="subtitle">
+          Two-handed air instrument · 2 complete octaves · quarter-tones · drone · beats. Touch circles with your index fingertip and <b>pinch thumb+index</b> to play/hold notes.
+        </div>
+      </div>
+      <div class="pills">
+        <span class="pill">Hover L: <b id="noteLabelL">—</b></span>
+        <span class="pill">Play L: <b id="playLabelL">—</b></span>
+        <span class="pill">Hover R: <b id="noteLabelR">—</b></span>
+        <span class="pill">Play R: <b id="playLabelR">—</b></span>
+        <span class="pill">Beats: <b id="beatsLabel">on</b></span>
+        <span class="pill">Drone: <b id="droneLabel">off</b></span>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- MAIN (stage + advanced below) -->
+      <div class="panel">
+        <div class="inner">
+          <div class="stage">
+            <video id="video" playsinline></video>
+            <canvas id="overlay"></canvas>
+          </div>
+
+          <!-- Advanced settings moved UNDER the screen -->
+          <div class="below">
+            <details open>
+              <summary>Tracking + Visual + Sound shaping (advanced)</summary>
+              <div class="divider"></div>
+
+              <div class="row3">
+                <div>
+                  <label>Mirror webcam</label>
+                  <select id="mirror">
+                    <option value="on" selected>On</option>
+                    <option value="off">Off</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label>Hand view</label>
+                  <select id="handViz">
+                    <option value="cursor" selected>Cursor</option>
+                    <option value="points">Points</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label>Circle size</label>
+                  <input id="circleR" type="range" min="18" max="70" step="1" value="36"/>
+                </div>
+              </div>
+
+              <div class="row3" style="margin-top:10px;">
+                <div>
+                  <label>Pinch threshold</label>
+                  <input id="pinchTh" type="range" min="0.02" max="0.18" step="0.002" value="0.07"/>
+                </div>
+                <div>
+                  <label>Smoothing (EMA alpha)</label>
+                  <input id="smoothA" type="range" min="0" max="0.95" step="0.01" value="0.55"/>
+                </div>
+                <div>
+                  <label>Max FPS</label>
+                  <input id="maxFps" type="range" min="5" max="60" step="1" value="30"/>
+                </div>
+              </div>
+
+              <div class="row3" style="margin-top:10px;">
+                <div>
+                  <label>Glide (portamento)</label>
+                  <input id="glide" type="range" min="0" max="0.25" step="0.01" value="0.08"/>
+                </div>
+                <div>
+                  <label>Reverb</label>
+                  <input id="reverb" type="range" min="0" max="1" step="0.01" value="0.45"/>
+                </div>
+                <div>
+                  <label>Instrument volume</label>
+                  <input id="instVol" type="range" min="0" max="1" step="0.01" value="0.70"/>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDE PANEL (core controls + microtuning) -->
+      <div class="panel">
+        <div class="inner">
+          <div class="row2">
+            <div>
+              <button id="startCamBtn" class="primary">Start Camera</button>
+              <div class="status" id="camStatus">Webcam: not started</div>
+            </div>
+            <div>
+              <button id="startAudioBtn" class="primary">Start Audio</button>
+              <div class="status" id="audioStatus">Audio: not started</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="controlsGrid">
+            <div>
+              <label>Instrument</label>
+              <select id="instrument">
+                <option value="warm_pad" selected>Warm Pad</option>
+                <option value="soft_keys">Soft Keys</option>
+                <option value="organ">Organ</option>
+                <option value="flute">Flute</option>
+                <option value="pluck">Pluck</option>
+                <option value="bass">Bass</option>
+                <option value="synth">Synth</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Tempo</label>
+              <input id="tempo" type="range" min="70" max="140" step="1" value="92"/>
+            </div>
+
+            <div>
+              <label>Beats</label>
+              <select id="beatsOn">
+                <option value="on" selected>On</option>
+                <option value="off">Off</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Beat pattern</label>
+              <select id="beatPattern">
+                <option value="straight" selected>Straight (4/4)</option>
+                <option value="house">House</option>
+                <option value="techno">Techno</option>
+                <option value="break">Break</option>
+                <option value="shuffle">Shuffle</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Beat volume</label>
+              <input id="beatVol" type="range" min="0" max="1" step="0.01" value="0.22"/>
+            </div>
+
+            <div>
+              <label>Drone</label>
+              <select id="droneOn">
+                <option value="off" selected>Off</option>
+                <option value="on">On</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Drone mode</label>
+              <select id="droneMode">
+                <option value="root" selected>Root</option>
+                <option value="root5">Root + Fifth</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Drone volume</label>
+              <input id="droneVol" type="range" min="0" max="1" step="0.01" value="0.22"/>
+            </div>
+          </div>
+
+          <details open class="micro">
+            <summary>Quarter-tone lowering (−50 cents)</summary>
+            <div class="microKeyboard">
+              <div class="microRowBlack">
+                <button class="microBtn black blackPos posCs" data-note="C#">Lower C#</button>
+                <button class="microBtn black blackPos posDs" data-note="D#">Lower D#</button>
+                <button class="microBtn black blackPos posFs" data-note="F#">Lower F#</button>
+                <button class="microBtn black blackPos posGs" data-note="G#">Lower G#</button>
+                <button class="microBtn black blackPos posAs" data-note="A#">Lower A#</button>
+              </div>
+
+              <div class="microRowWhite">
+                <button class="microBtn" data-note="C">Lower C</button>
+                <button class="microBtn" data-note="D">Lower D</button>
+                <button class="microBtn" data-note="E">Lower E</button>
+                <button class="microBtn" data-note="F">Lower F</button>
+                <button class="microBtn" data-note="G">Lower G</button>
+                <button class="microBtn" data-note="A">Lower A</button>
+                <button class="microBtn" data-note="B">Lower B</button>
+              </div>
+            </div>
+
+            <button id="microResetBtn">Reset microtuning</button>
+
+            <div class="hint" style="border-top:none;padding-top:8px;margin-top:6px;">
+              These buttons lower the pitch by a <b>quarter tone</b> (−50 cents). It affects <b>both hands</b>, <b>both octaves</b> and the <b>drone</b>.
+            </div>
+          </details>
+
+          <div class="hint">
+            <b>How to play:</b><br/>
+            • Put your <b>index fingertip on a circle</b> and <b>pinch thumb+index</b> to hold a note.<br/>
+            • You can play <b>two notes</b> at once (two hands).<br/>
+            • Higher octave is on the <b>right</b>. Keyboard is always <b>starting at C</b>.<br/>
+            • <b>Up/Down (Y)</b> controls brightness (higher = brighter).<br/><br/>
+            <b>Audio:</b> Press <b>Start Audio</b> once (browser policy). It becomes <b>Stop Audio</b>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>
