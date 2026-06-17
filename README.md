@@ -28,12 +28,12 @@ Each hand has its own cursor and its own octave range, so you can play two-hande
 ## What's in the box
 
 - **2 hands tracked** simultaneously (MediaPipe HandLandmarker)
-- **2 complete octaves** of standard pitches per hand
-- **Quarter-tones** — global buttons that shift the whole grid by a quarter-semitone, plus a root+5th drone that follows
-- **Beats layer** — straight, house, techno, break, shuffle
-- **6 instruments** — warm pad (default), soft keys, organ, flute, pluck, bass, synth
+- **2 complete octaves** of standard pitches per hand (C..C..C, 15 notes)
+- **Quarter-tones** — per-note buttons that lower each note by a quarter-semitone (−50 cents). Affects both hands, both octaves, and the drone. A "Reset microtuning" button restores everything.
+- **Beats layer** — straight (4/4), house, techno, break, shuffle
+- **7 instruments** — warm pad (default), soft keys, organ, flute, pluck, bass, synth
 - **Drone** with root or root+5th voicing
-- Glide, reverb, smoothing, pinch threshold — all adjustable from the panel
+- Glide, reverb, smoothing, pinch threshold, mirror, hand view — all adjustable from the panel
 
 ## Files
 
@@ -55,3 +55,8 @@ The MediaPipe model is loaded from the local `static/models/` folder. The MediaP
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Project
+
+- **Source / issues:** [github.com/zaheralkaei/pinchorchestra](https://github.com/zaheralkaei/pinchorchestra)
+- **Author:** [Zaher Alkaei](https://github.com/zaheralkaei)
