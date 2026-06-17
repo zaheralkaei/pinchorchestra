@@ -198,20 +198,38 @@
     }
     .microRowWhite{
       position:absolute; bottom:0; left:0; right:0;
-      display:flex; justify-content:space-between; gap:8px;
+      display:grid; grid-template-columns: repeat(7, 1fr); gap:6px;
     }
     .microRowBlack{
       position:absolute; top:0; left:0; right:0; height: 44px;
+      /* Black keys are positioned as percentages of the keyboard width (set in
+         .posCs/.posDs/.posFs/.posGs/.posAs). They are absolutely positioned
+         within .microRowBlack which spans the full keyboard width, so the
+         percentages are independent of the white-row layout. */
+    }
+    /* White keys (inside .microRowWhite) fill their grid cell */
+    .microRowWhite .microBtn{
+      width:100%;
+      min-width:0;
+      padding: 8px 4px;
+      border-radius: 10px;
+    }
+    /* Black keys (inside .microRowBlack) are absolutely positioned within
+       the row at fixed percentage points, and use width:auto so they size
+       to their text (not the full row width). */
+    .microRowBlack .microBtn{
+      width:auto;
+      padding: 6px 10px;
+      font-size: 11px;
     }
     .microBtn{
-      width:auto;
-      padding: 10px 10px;
-      border-radius: 14px;
       font-size: 12px;
       border:1px solid var(--border);
       background: rgba(27,30,35,0.85);
       color: var(--text);
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .microBtn.active{
       border-color: var(--accent);
